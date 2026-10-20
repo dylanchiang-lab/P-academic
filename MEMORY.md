@@ -21,7 +21,7 @@
 ## Deployment Boundary
 
 - 統一規則：本工作流唯一部署到 GitHub 的網站是 `DylanChiang-Dev.github.io`，使用 GitHub Actions + GitHub Pages；其他現役網站部署到 Cloudflare Pages／Workers，GitHub 僅保存原始碼或作為 Cloudflare 的建置來源，不是部署平台。
-- 本倉庫是學術網站原始碼；GitHub Actions 將產物發布至個人帳號的 Pages 入口，保留原 github.io 網址。
+- 本倉庫是學術網站原始碼；GitHub Actions 將產物發布至個人帳號的 Pages 入口，保留原 github.io 網址。個人倉庫的 gh-pages 是發布分支，main 僅保留遷移前歷史。
 
 ## Latest Entries
 
@@ -30,7 +30,11 @@
 - 使用者要求保留完整原網址，並明確同意原始碼移至組織、個人倉庫繼續作發布入口及新增跨倉庫發布金鑰。
 - 原始碼歷史以原倉庫已發布 `bb35e92ee3e86819aea999095cacb920c7aff5df` 為基準複製到 `dylanchiang-lab/P-academic`；本機既有未提交修改不納入此次發布。
 - 新工作流保留 Hugo Extended 0.148.2、Node 24 與原 pnpm lock，固定原正式 baseURL；只授予 job contents:read，發布金鑰僅能寫入原個人發布倉庫。
-- 切換前先驗證新工作流能建置並寫入 gh-pages，再切換原個人倉庫的 Pages source；原 main 與歷史保留作回復依據。正式切換與驗證結果於完成後補記。
+- 首次真實 main 推送 `91744f924351aa47b498b3c38abbe3dde18666f3` 已觸發 Actions `39420399664`，建置與 SSH 發布成功，寫入個人發布分支 `d9c986e4b812e3114869cdaea9c5f0533b450203`。
+- 個人倉庫的 Pages source 已切為 gh-pages／root（legacy 原生發布），default branch 為 gh-pages；原 main `bb35e92ee3e86819aea999095cacb920c7aff5df` 保留，舊 main 直接部署工作流已停用。初始化 Pages 建置 `1299729785`／Actions `39421447464` 成功。
+- 正式中英文首頁維持原 URL，回應 200，HTML 與新發布分支逐位元一致，且 SHA-256 與遷移前一致；各自抽查 10 個同源 CSS／JS／圖片均 200。
+- 本機工作樹的 270 個既有檔案、HEAD 與未提交狀態核對保留，origin 已指向 P-academic。未強行 pull 覆寫既有改動；下次整理這批修改時，先合併 origin/main 的新部署設定，避免把舊發布工作流推回去。
+- 此筆紀錄更新會再以正常 main 推送驗證既有發布分支的更新路徑；最終自動發布結果保存於工作流 owner 的正式維護記錄。
 
 ### 2026-10-03 桌面首頁區塊寬度統一
 
