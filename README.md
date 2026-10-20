@@ -1,3 +1,11 @@
+## 原始碼與網站發布
+
+- 原始碼與日後修改入口：`dylanchiang-lab/P-academic`。
+- 正式網站維持 `https://dylanchiang-dev.github.io/`。
+- 推送 `main` 後由本倉庫的 GitHub Actions 建置，再使用專用發布金鑰將靜態產物寫入個人倉庫 `DylanChiang-Dev/DylanChiang-Dev.github.io` 的 `gh-pages` 分支。
+- 個人倉庫只作為原網址的發布入口；其舊 `main` 分支保留歷史，不再維護原始碼。
+- `ACADEMIC_PAGES_DEPLOY_KEY` 是本倉庫的 Actions Secret，私鑰不得放入原始碼、日誌或網站產物。
+
 # Dylan Chiang 的學術個人網站
 
 歡迎來到蔣濤（Dylan Chiang）的個人學術網站。這是一個基於 Hugo Blox Builder 構建的平台，用於展示我的學術成果、研究項目以及專業經歷，同時也是我分享研究心得與技術見解的空間。
@@ -19,8 +27,8 @@
 
 ```bash
 # 1. 克隆倉庫
-git clone https://github.com/DylanChiang-Dev/DylanChiang-Dev.github.io.git
-cd DylanChiang-Dev.github.io
+git clone https://github.com/dylanchiang-lab/P-academic.git
+cd P-academic
 
 # 2. 安裝依賴
 pnpm install

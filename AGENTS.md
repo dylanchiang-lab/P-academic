@@ -7,14 +7,10 @@
 - Use `MEMORY.md` for durable collaboration notes, decisions, deployment facts, and gotchas.
 - Do not write secrets, tokens, private keys, or `.env` values into repository files or logs.
 
-## Repository
+## Repository routing
 
-- Owner: `DylanChiang-Dev`
-- Repository: `DylanChiang-Dev.github.io`
-- Origin: `https://github.com/DylanChiang-Dev/DylanChiang-Dev.github.io`
-- Local path: `/Users/dc/Documents/github/DylanChiang-Dev/DylanChiang-Dev.github.io`
-- Main branch: `main`
-- Private: `False`
+- 目前原始碼倉庫、正式網址與發布位置以 `MEMORY.md` 的 Current Repository Facts 為準。
+- 原始碼與網站發布分屬不同倉庫；不得直接修改或覆蓋發布倉庫的舊 main 原始碼歷史。
 
 ## Tech Stack
 

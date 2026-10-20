@@ -1,119 +1,75 @@
-name: Deploy website to GitHub Pages
+name: Build and publish academic website
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: academic-pages-production
+  cancel-in-progress: false
 
 env:
   WC_HUGO_VERSION: '0.148.2'
   NODE_VERSION: '24'
-
-on:
-  # Trigger the workflow every time you push to the `main` branch
-  push:
-    branches: ['main']
-  # Allows you to run this workflow manually from the Actions tab on GitHub
-  workflow_dispatch:
-
-# Provide permission to clone the repo and deploy it to GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: 'pages'
-  cancel-in-progress: false
+  SITE_URL: https://dylanchiang-dev.github.io/
 
 jobs:
-  # Build website
-  build:
-    if: github.repository_owner != 'HugoBlox'
+  publish:
+    if: github.repository == 'dylanchiang-lab/P-academic'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v7
+      - name: Checkout source and history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          # Fetch history for Hugo's .GitInfo and .Lastmod
           fetch-depth: 0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: ${{ env.NODE_VERSION }}
+          persist-credentials: false
 
       - name: Setup pnpm
-        if: hashFiles('package.json') != ''
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          run_install: false
 
-      - name: Install dependencies
-        run: |
-          # Install Tailwind CLI if package.json exists
-          if [ -f "package.json" ]; then
-            echo "Installing Tailwind dependencies..."
-            pnpm install || npm install
-          fi
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
 
-      - name: Setup Hugo
-        uses: peaceiris/actions-hugo@v3
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup Hugo Extended
+        uses: peaceiris/actions-hugo@2752ce1d29631191ea3f27c23495fa06139a5b78 # v3.2.1
         with:
           hugo-version: ${{ env.WC_HUGO_VERSION }}
           extended: true
 
-      # Cache dependencies (Go modules, node_modules) - stable, rarely changes
-      - uses: actions/cache@v6
+      - name: Cache Hugo modules and processed resources
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: |
-            /tmp/hugo_cache_runner/
-            node_modules/
-            modules/*/node_modules/
-          key: ${{ runner.os }}-hugo-deps-${{ hashFiles('**/go.mod', '**/package-lock.json', '**/pnpm-lock.yaml') }}
+            ${{ runner.temp }}/hugo-cache
+            resources/
+          key: ${{ runner.os }}-academic-hugo-${{ env.WC_HUGO_VERSION }}-${{ hashFiles('go.mod', 'go.sum', 'pnpm-lock.yaml', 'assets/**', 'config/**') }}
           restore-keys: |
-            ${{ runner.os }}-hugo-deps-
+            ${{ runner.os }}-academic-hugo-${{ env.WC_HUGO_VERSION }}-
 
-      # Cache Hugo resources (processed images, CSS) - invalidates only when assets/config change
-      - uses: actions/cache@v6
-        with:
-          path: resources/
-          key: ${{ runner.os }}-hugo-resources-${{ hashFiles('assets/**/*', 'config/**/*', 'hugo.yaml', 'package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-hugo-resources-
-
-      - name: Setup Pages
-        id: pages
-        uses: actions/configure-pages@v6
-
-      - name: Build with Hugo
+      - name: Build the original site URL
         env:
           HUGO_ENVIRONMENT: production
+          HUGO_CACHEDIR: ${{ runner.temp }}/hugo-cache
         run: |
-          echo "Hugo Cache Dir: $(hugo config | grep cachedir)"
-          hugo --minify --baseURL "${{ steps.pages.outputs.base_url }}/"
+          hugo --minify --cleanDestinationDir --baseURL "$SITE_URL"
+          test -s public/index.html
+          test -s public/en/index.html
+          touch public/.nojekyll
 
-      - name: Generate Pagefind search index (if applicable)
-        run: |
-          # Check if site uses Pagefind search
-          if [ -f "package.json" ] && grep -q "pagefind" package.json; then
-            pnpm dlx pagefind --source "public" || npx pagefind --source "public"
-          elif [ -f "netlify.toml" ] && grep -q "pagefind" netlify.toml; then
-            pnpm dlx pagefind --source "public" || npx pagefind --source "public"
-          fi
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v5
-        with:
-          path: ./public
-
-  # Deploy website to GitHub Pages hosting
-  deploy:
-    if: github.repository_owner != 'HugoBlox'
-    needs: build
-    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
-    permissions:
-      pages: write # to deploy to Pages
-      id-token: write # to verify the deployment originates from an appropriate source
-    # Deploy to the github-pages environment
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v5
+      - name: Publish generated files to the personal Pages repository
+        env:
+          PAGES_DEPLOY_KEY: ${{ secrets.ACADEMIC_PAGES_DEPLOY_KEY }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: bash .github/scripts/publish-pages.sh

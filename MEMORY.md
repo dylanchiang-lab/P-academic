@@ -10,20 +10,27 @@
 
 ## Current Repository Facts
 
-- Owner: `DylanChiang-Dev`
-- Repository: `DylanChiang-Dev.github.io`
-- Origin: `https://github.com/DylanChiang-Dev/DylanChiang-Dev.github.io`
+- Owner: `dylanchiang-lab`
+- Repository: `P-academic`
+- Origin: `https://github.com/dylanchiang-lab/P-academic.git`
 - Local path: `/codex/002/个人网站维护/DylanChiang-Dev.github.io`
 - Main branch: `main`
 - Documentation standardized: 2026-05-18 02:30 CST
-- Deployment: Automated GitHub Pages build and deployment triggered directly by pushes to the `main` branch via GitHub Actions (`.github/workflows/deploy.yml`).
+- Deployment: `main` push 在本倉庫建置，專用 deploy key 將靜態產物發布至 `DylanChiang-Dev/DylanChiang-Dev.github.io` 的 `gh-pages`；正式網址維持 `https://dylanchiang-dev.github.io/`。
 
 ## Deployment Boundary
 
 - 統一規則：本工作流唯一部署到 GitHub 的網站是 `DylanChiang-Dev.github.io`，使用 GitHub Actions + GitHub Pages；其他現役網站部署到 Cloudflare Pages／Workers，GitHub 僅保存原始碼或作為 Cloudflare 的建置來源，不是部署平台。
-- 本倉庫是唯一的 GitHub Pages 例外：由 GitHub Actions 建置並發布到 GitHub Pages。
+- 本倉庫是學術網站原始碼；GitHub Actions 將產物發布至個人帳號的 Pages 入口，保留原 github.io 網址。
 
 ## Latest Entries
+
+### 2026-10-20 分離原始碼與個人 Pages 發布入口
+
+- 使用者要求保留完整原網址，並明確同意原始碼移至組織、個人倉庫繼續作發布入口及新增跨倉庫發布金鑰。
+- 原始碼歷史以原倉庫已發布 `bb35e92ee3e86819aea999095cacb920c7aff5df` 為基準複製到 `dylanchiang-lab/P-academic`；本機既有未提交修改不納入此次發布。
+- 新工作流保留 Hugo Extended 0.148.2、Node 24 與原 pnpm lock，固定原正式 baseURL；只授予 job contents:read，發布金鑰僅能寫入原個人發布倉庫。
+- 切換前先驗證新工作流能建置並寫入 gh-pages，再切換原個人倉庫的 Pages source；原 main 與歷史保留作回復依據。正式切換與驗證結果於完成後補記。
 
 ### 2026-10-03 桌面首頁區塊寬度統一
 
